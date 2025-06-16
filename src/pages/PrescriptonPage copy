@@ -1,0 +1,459 @@
+
+import Header from "../components/Header"
+import Form from 'react-bootstrap/Form';
+import { Button, Card, Col, Row, Table } from 'react-bootstrap';
+import { useState , useEffect } from "react";
+import { getPatientByName, getPatientById} from  '../services/PatientService';
+import { createPrescription, getPrescriptionByPatientId} from '../services/PrescriptionService';
+
+export const PrescriptionPageCOPY = ({ loggedInUser }) => {
+
+  const [errors, setErrors] = useState({
+    pId: '',
+    pFirstName: ''
+  })
+
+  const [presError, setPressErrors] = useState({
+    pDescError: '',
+    pOtherError: '',
+    pDiagnoseError:''
+  })
+
+  const [pid, setPId] = useState('');
+  const [pFirstName, setPFirstName] = useState('');
+
+  const [paId, setPaId] = useState('');
+  const [paFName, setPaFName] = useState('');
+  const [paLName, setPaLName] = useState('');
+  const [paAge, setPaAge] = useState('');
+  const [paAddress, setpaAddress] = useState('');
+
+  const [presDesc, setPresDesc] = useState('');
+  const [presOther, setPresOther] = useState('');
+  const [presDiagnose, setPresDiagnose] = useState('');
+  const [presId, setpresId] = useState('');
+  const [presDate, setPresDate] = useState('');
+  const [presStatus, setPreStatus] = useState('');
+
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [presSaveButton, setPresSaveButton] = useState('');
+
+  
+
+  function handleSearchButton(e) { 
+    e.preventDefault();
+    if (validateForm() ) {
+      if (pFirstName !== '') {
+          const patient = {
+          "pfirstName": pFirstName
+          }
+         getPatientByName(patient).then((response) => {
+          if (!response.data || response.data.length === 0) {
+            console.error("No patient data found.");
+            setPatientExists(false);
+        // You can also display an error message in the UI here, for example:
+           setErrorMessage("No patient data found.");  // Assuming setErrorMessage is defined in your component
+          return; // Stop execution if no data is available
+          }
+          const resPatData = response.data[0];
+          setPaFName(resPatData.pfirstName);
+          setPaLName(resPatData.plastName);
+          setPaAge(resPatData.pdob);
+          setpaAddress(resPatData.paddress);
+          setPId(resPatData.pid);
+          setPaId(resPatData.pid);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
+      } else {
+          const patient = {
+          "id": pid
+          }
+          getPatientById(patient).then((response) => {
+          if (!response.data || response.data.length === 0) {
+            console.error("No patient data found.");
+           // setPatientExists(false);
+        // You can also display an error message in the UI here, for example:
+          setErrorMessage("No patient data found.");  // Assuming setErrorMessage is defined in your component
+          return; // Stop execution if no data is available
+         }
+
+          const resPatData = response.data;
+          setPaFName(resPatData.pfirstName);
+          setPaLName(resPatData.plastName);
+          setPaAge(resPatData.pdob);
+          setpaAddress(resPatData.paddress);
+          setPId(resPatData.pid);
+          setPaId(resPatData.pid);
+
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
+          // setPrescriptions
+          // here going to load the patient prescritions using the patient id. some how needs to wait till the patient id is fetched.
+        const tempPrescription = {
+          "presPatientId" : pid
+        }
+        getPrescriptionByPatientId (tempPrescription).then((response) => {
+          console.log(response.data);
+          setPrescriptions( response.data);
+          
+        }).catch(error => {
+          console.error(error);
+        })
+      }
+    }
+  }
+
+  function handlePFirstName(e) {
+    setPFirstName(e.target.value);
+  }
+
+  function handlePid(e) {
+    setPId(e.target.value);
+  }
+
+function validateForm() {
+  const errorsCopy = { ...errors };
+  let isValid = true;
+
+  if (!pFirstName.trim() && !pid.trim()) {
+    const errorMsg = "Enter Patient's First Name or ID to search";
+    errorsCopy.pFirstName = errorMsg;
+    errorsCopy.pId = errorMsg;
+    isValid = false;
+  } else {
+    // Clear previous errors
+    errorsCopy.pFirstName = '';
+    errorsCopy.pId = '';
+  }
+
+  setErrors(errorsCopy);
+  return isValid;
+}
+
+function prescriptioFormValidation() {
+
+  let valid = true;
+  const errorsCopy = {...presError}
+
+  if (presDiagnose.trim()) {
+    errorsCopy.pDiagnoseError ='';
+  } else {
+    errorsCopy.pDiagnoseError = 'Diagnose Details required';
+    valid = false;
+  }
+  if (presDesc.trim()) {
+    errorsCopy.pDescError ='';
+  } else {
+    errorsCopy.pDescError = 'Prescription is required';
+    valid = false;
+  }
+  if (presOther.trim()) {
+    errorsCopy.pOtherError ='';
+  } else {
+    errorsCopy.pOtherError = 'Other information is required';
+    valid = false;
+  }
+    setPressErrors(errorsCopy)
+    return valid;
+}
+
+
+
+function handlePresDescription(e){
+  setPresDesc(e.target.value);
+}
+
+function handlePresDiagnoseDetails(e) {
+  setPresDiagnose(e.target.value);
+}
+
+function handlePresOther(e) {
+  setPresOther(e.target.value);
+}
+
+function handlePresSaveButton(e){
+  e.preventDefault();
+  if (prescriptioFormValidation()) {
+    const newPrescription = {
+      "presDateTime" : "15/06/2025",
+      "presDiagnose" : presDiagnose,
+      "presDec" : presDesc,
+      "preOthers" : presOther ,
+      "presPatientId" : pid,
+      "presStatus" : "SAVED"
+    } 
+    createPrescription (newPrescription).then((response) => {
+      console.log(response.data);
+    }).catch(error => {
+      console.error(error);
+    })
+  }
+}
+
+function handlePresPrrescribeButton() {
+   const newPrescription = {
+      "presDateTime" : "15/06/2025",
+      "presDiagnose" : presDiagnose,
+      "presDec" : presDesc,
+      "preOthers" : presOther ,
+      "presPatientId" : pid,
+      "presStatus" : "PRESCRIBED",
+      "id" : 2
+    } 
+    createPrescription (newPrescription).then((response) => {
+      console.log(response.data);
+    }).catch(error => {
+      console.error(error);
+    })
+}
+
+function handleClearButton(e) {
+  e.preventDefault();
+  setPId('');
+  setPFirstName('');
+  setPaAge('');
+  setPaFName('');
+  setPaLName('');
+  setpaAddress('');
+}
+
+function handleRowClicked(prescription) {
+  //preventDefault();
+  
+  setSelectedPrescription(prescription);
+  setPresDesc(selectedPrescription.presDec);
+  setPresOther(selectedPrescription.preOthers);
+  setPresDiagnose(selectedPrescription.presDiagnose);
+  setPreStatus(selectedPrescription.presStatus);
+  setPaId(pid);
+  setPId(pid);
+
+console.log("row is clicked, patient id is :" +  paId);
+  
+}
+
+useEffect(() => {
+  if (selectedPrescription) {
+    setPresDesc(selectedPrescription.presDec);
+    setPresOther(selectedPrescription.preOthers);
+    setPresDiagnose(selectedPrescription.presDiagnose);
+    setPresDate(selectedPrescription.presDateTime);
+    setPreStatus(selectedPrescription.presStatus);
+    setPaId(pid);
+    //setPresSaveButton()
+    console.log("Updated Selected Prescription:", selectedPrescription);
+    // Perform your logic here
+  }
+}, [selectedPrescription]);
+  
+return (
+    <>
+      <Row>   {/* patient ifnrmaton hadanne------------------------------------------- */}
+        <Header loggedInUser={loggedInUser} />
+        <div className="d-flex justify-content-around">
+          <Card style={{ width: '50%' }}>
+            <Card.Body>
+              <Card.Title>Patient Information</Card.Title>
+              <Card.Text>
+                <Form>
+                  <Row>
+                    <Col>
+                      <Form.Group className="mb-3" controlId="formPatientFirstName">
+                        <Form.Label>First Name:</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter Patient First Name"
+                          value={pFirstName}
+                          onChange={handlePFirstName}
+                          className={`form-control ${errors.pFirstName ? 'is-invalid' : ''}`}
+                        />
+                        {errors.pFirstName && <div className="invalid-feedback">{errors.pFirstName}</div>}
+                      </Form.Group>
+                    </Col>
+
+                    <Col>
+                      <Form.Group className="mb-3" controlId="formPatientId">
+                        <Form.Label>Patient ID:</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter Patient ID"
+                          value={pid}
+                          onChange={handlePid}
+                          className={`form-control ${errors.pId ? 'is-invalid' : ''}`}
+                        />
+                        {errors.pId && <div className="invalid-feedback">{errors.pId}</div>}
+                      </Form.Group>
+                    </Col>
+
+                    <Col xs="auto" className="d-flex justify-content-end align-items-end">
+                      <div>
+                        <Button className="me-2" variant="primary" onClick={handleSearchButton}>
+                          Search
+                        </Button>
+                        <Button variant="secondary" onClick={handleClearButton}>
+                          Clear
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+                </Form>
+              </Card.Text>
+            </Card.Body>
+          </Card>
+          <Card style={{ width: '50%' }}> {/* Patient Details ......  */}
+            <Card.Body>
+              <Card.Title>Patient Details</Card.Title>
+              <Card.Text>
+                <Form>
+                  <Row>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Label>First Name : {paFName + " " + paLName} </Form.Label>
+                      </Form.Group>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Label>ID : {paId}</Form.Label>
+                      </Form.Group>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Age : {paAge}</Form.Label>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Address : {paAddress}</Form.Label>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </Form>
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </div>
+      </Row>
+
+      <Row>
+        <Col className="d-flex justify-content-left" >
+          <Card style={{ width: '100%' }}>
+            <Card.Body>
+              <Card.Title>Create Prescription</Card.Title>
+              <Card.Text>
+                <Form>
+                  <Row>
+                    <Col >
+                      <Form.Group className="mb-6" controlId="formPresDiagnoseDetails">
+                        <Form.Label>Diagnose details</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter Diagnos details"
+                          value={presDiagnose}
+                          onChange={handlePresDiagnoseDetails}
+                          className={`form-control ${presError.pDiagnoseError ? 'is-invalid' : ''}`}
+                        />
+                        {presError.pDiagnoseError && <div className="invalid-feedback">{presError.pDiagnoseError}</div>}
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <Form.Group className="mb-3" controlId="formPresPrescrition">
+                        <Form.Label>Prescription :</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter Prescription"
+                          value={presDesc}
+                          onChange={handlePresDescription}
+                          className={`form-control ${presError.pDescError ? 'is-invalid' : ''}`}
+                        />
+                        {presError.pDescError && <div className="invalid-feedback">{presError.pDescError}</div>}
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <Form.Group className="mb-3" controlId="formPresOther">
+                        <Form.Label>Other Details :</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Other details"
+                          value={presOther}
+                          onChange={handlePresOther}
+                          className={`form-control ${presError.pOtherError ? 'is-invalid' : ''}`}
+                        />
+                        {presError.pOtherError && <div className="invalid-feedback">{presError.pOtherError}</div>}
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col xs="auto" className="d-flex justify-content-end align-items-end">
+                      <div>
+                        <Button className="me-2" variant="primary" onClick={handlePresSaveButton}  disabled={presStatus === 'SAVED'}>
+                          Save
+                        </Button>
+                        <Button variant="primary" onClick={handlePresPrrescribeButton}>
+                          Prescribe
+                        </Button>
+                        <Button variant="secondary">
+                          Clear
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+                </Form>
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col className="d-flex justify-content-left" >
+          <Card style={{ width: '100%' }}>
+            <Card.Body>
+              <Card.Title>Prescriptions history</Card.Title> {/* Thisis a table */}
+              <Card.Text>
+                <Form>
+                 <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Date</th>
+                      <th>Diagnose</th>
+                      <th>Prescrition</th>
+                      <th>Other</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {
+                    prescriptions.map(prescription => 
+                      <tr key={prescription.id } onClick={() => handleRowClicked(prescription)}>
+                        <td>{prescription.id }</td>
+                        <td>{prescription.presDateTime}</td>
+                        <td>{prescription.presDiagnose}</td>
+                        <td>{prescription.presDec}</td>
+                        <td>{prescription.preOthers}</td>
+                        <td>{prescription.presStatus}</td>
+                      </tr>
+                    )
+                  }
+                  </tbody>
+                </Table>
+                </Form>
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </>
+  )
+}
