@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider, Route, Routes, Link  } from 'react
 import { PrescriptionPage } from './pages/PrescriptonPage';
 import { PatientRegistrationPage } from './pages/PatientRegistrationPage';
 import { useEffect, useState } from 'react';
+import { RegisterUser } from './pages/RegisterUserPage';
 
 function App() {
 
@@ -41,6 +42,11 @@ useEffect(() => {
       path: '/patietnregistration',
       element:< PatientRegistrationPage loggedInUser={loggedInUser}/>
     },
+        {
+      path: '/RegisterUser',
+      element:< RegisterUser loggedInUser={loggedInUser}/>
+    },
+
 
 
     

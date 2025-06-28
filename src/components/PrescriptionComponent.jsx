@@ -106,6 +106,7 @@ function handlePresOther(e) {
 
 function handlePrecSaveButton(e){
   e.preventDefault();
+
   if (prescriptioFormValidation()) {
     const newPrescription = {
       "presDateTime" : "",
@@ -174,6 +175,8 @@ function clearFields() {
   setPrecStatus('');
   setPrescId('');
   setPrecDate('');
+  console.log('clear is cliecked')
+  console.log(localStorage.getItem("token"))
 }
 
 
@@ -206,6 +209,7 @@ function clearFields() {
                       <Form.Group className="mb-3" controlId="formPresPrescrition">
                         <Form.Label>Prescription :</Form.Label>
                         <Form.Control
+                         as="textarea"
                           type="text"
                           placeholder="Enter Prescription"
                           value={precDesc}
@@ -232,13 +236,13 @@ function clearFields() {
                     </Col>
                   </Row>
                   <Row>
-                    <Col xs="auto" className="d-flex justify-content-end align-items-end">
+                    <Col xs="auto" className="ms-auto">
                       <div>
                         <Button className="me-2" variant="primary" onClick={handlePrecSaveButton} 
                          disabled={precStatus === 'SAVED' | precStatus === 'PRESCRIBED'}>
                           Save
                         </Button>
-                        <Button variant="primary" onClick={handlePrecPrescribeButton} disabled={precStatus !== 'SAVED'}>
+                        <Button className="me-2" variant="primary" onClick={handlePrecPrescribeButton} disabled={precStatus !== 'SAVED'}>
                           Prescribe
                         </Button>
                         <Button variant="secondary" onClick={handlePrescriptionClear}>

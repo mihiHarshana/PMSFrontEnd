@@ -3,11 +3,13 @@
     import Form from 'react-bootstrap/Form';
     import {useNavigate } from 'react-router-dom';
     import {userAuthentication} from  '../services/UserService';
+   
 
     export const LoginPage = ({setLoggedInUser}) => {
 
       const [userName, setUserName] = useState('')
       const [userPassword, setUserPassword] = useState('')
+      const [token, setToken] = useState("");
 
       const navigator = useNavigate();  
 
@@ -33,8 +35,11 @@
         userAuthentication(user)
           .then((response) => {
             console.log(response.data);
-            const logeduser = response.data.userName
+            const logeduser = response.data.loginRequest
+            setToken(response.data.token);
             setLoggedInUser(logeduser);
+            localStorage.setItem("token", response.data.token);
+            console.log(localStorage.getItem("token"));
             navigator('/home');
           })
           .catch((error) => {
