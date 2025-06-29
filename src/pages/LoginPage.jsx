@@ -10,6 +10,7 @@ import { Card } from 'react-bootstrap';
 
       const [userName, setUserName] = useState('')
       const [userPassword, setUserPassword] = useState('')
+      const maintainanceMsg = false;
 
       const navigator = useNavigate();  
 
@@ -71,21 +72,21 @@ import { Card } from 'react-bootstrap';
       return (
         <div className='container'>
             <div className='row'>
-
+              {maintainanceMsg && (
               <Card>
                 <Card.Body>
                   <Card.Title>System Maintenance Notice:</Card.Title>
                   <Card.Text>
-                             <span className='text-danger'>
-  <b>System Maintenance Notice:</b> We are upgrading our system to serve you better. <br />
-  Please expect service interruptions from <b>29/06/2025 1:00 AM</b> to <b>30/06/2025 8:00 AM SLST</b>. <br />
-  <i>We apologize for any inconvenience caused.</i>
-</span>
+                   <span className='text-danger'>
+                    <b>System Maintenance Notice:</b> We are upgrading our system to serve you better. <br />
+                    Please expect service interruptions from <b>29/06/2025 1:00 AM</b> to <b>30/06/2025 8:00 AM SLST</b>. <br />
+                    <i>We apologize for any inconvenience caused.</i>
+                    </span>
 
 
                   </Card.Text>
                 </Card.Body>
-              </Card>
+              </Card> )}
 
             <div className='card col-md-6 offset-md3 offset-md-3 '>
                 <br />
