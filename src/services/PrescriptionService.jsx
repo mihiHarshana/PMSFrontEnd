@@ -3,21 +3,14 @@ import API_BASE_URL from './Constance.jsx';
 
 const REST_API_BASE_URL = API_BASE_URL+'/prescription';
 
-
+axios.defaults.withCredentials = true;
 export const getthis = () => {
     return axios.get(REST_API_BASE_URL);
 }
 
-export const createPrescription = (Prescription) => axios.post(REST_API_BASE_URL + '/register', 
-    {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    },
-    
-    Prescription);
+export const createPrescription = (Prescription) => axios.post(REST_API_BASE_URL + '/register' ,   Prescription );
 
-export const getPrescriptionByPatientId = (Prescription) => axios.post(REST_API_BASE_URL + '/getPrescritionByPatientId', Prescription);
+export const getPrescriptionByPatientId = (Prescription) => axios.post(REST_API_BASE_URL + '/getPrescritionByPatientId', Prescription );
 
 //export const getPatientByName = (name) => axios.post(REST_API_BASE_URL + '/getbyname', name);
 
