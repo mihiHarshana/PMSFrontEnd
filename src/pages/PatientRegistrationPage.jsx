@@ -21,7 +21,7 @@ export const PatientRegistrationPage = ({loggedInUser}) => {
   const [pEmail, setPEmail] = useState('')
   const [pGender, setPGender] = useState('')
   const [pDob, setPDob] = useState('')
-  const [pStatus, setPStatus] = useState('true') 
+  const [pStatus, setPStatus] = useState(true);
 
   const navigator = useNavigate();  
   const [errorMessage, setErrorMessage] = useState('')
